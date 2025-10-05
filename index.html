@@ -98,7 +98,7 @@
         /* doors layout */
         .doors {
             display: flex;
-            gap: 16px;
+            gap: 14px;
             justify-content: center;
             align-items: flex-end;
             flex-wrap: wrap
@@ -106,46 +106,43 @@
 
         .door {
             width: 28%;
-            min-width: 92px;
+            min-width: 80px;
             aspect-ratio: 3/4;
-            border-radius: 16px;
-            background: linear-gradient(180deg, #fff, #fff7fb);
-            position: relative;
-            cursor: pointer;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            transition: transform .32s cubic-bezier(.2, .9, .2, 1), box-shadow .28s ease, filter .28s;
-            box-shadow: 0 12px 30px var(--door-shadow), inset 0 -8px 18px rgba(0, 0, 0, 0.03);
+            border-radius: 18px;
+            background: linear-gradient(180deg, #fff9fb, #ffe6f0);
+            border: 2px solid #ff9dc0;
+            /* thêm khung màu hồng */
+            box-shadow: 0 10px 25px rgba(255, 100, 160, 0.2);
+            /* bóng nhẹ */
             display: flex;
             align-items: center;
             justify-content: center;
             flex-direction: column;
-        }
-
-        .door::before {
-            content: '';
-            position: absolute;
-            left: -30%;
-            top: -10%;
-            width: 60%;
-            height: 120%;
-            transform: rotate(-25deg);
-            background: linear-gradient(90deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.03));
-            opacity: 0.65;
-            pointer-events: none;
-            transition: transform .6s ease, opacity .4s ease;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .door:hover {
-            transform: translateY(-10px) rotateX(6deg) translateZ(0);
-            filter: saturate(1.03);
-            box-shadow: 0 28px 60px rgba(200, 70, 120, 0.10);
+            transform: translateY(-8px);
+            box-shadow: 0 18px 40px rgba(255, 100, 160, 0.3);
         }
 
         .face {
             font-size: 48px;
-            transition: transform .36s ease, opacity .36s
+            padding: 12px;
+            margin: 2px;
+
+            background: #fff0f6;
+            /* nền nhẹ cho mặt mèo */
+            border-radius: 50%;
+            border: 1px solid #ff9dc0;
+            box-shadow: inset 0 2px 6px rgba(255, 100, 160, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+
+
 
         .label {
             position: absolute;
@@ -357,10 +354,10 @@
         <div class="card" role="application" aria-label="Cánh cửa tình yêu (ballad)">
             <div class="header">
                 <div>
-                    <div class="title">Cánh cửa dẫn lối 💞</div>
+                    <div class="title">PU💞</div>
                     <div class="subtitle"></div>
                 </div>
-                <div class="score">Chuỗi: <span id="streak">0</span></div>
+                <div class="score">Màn: <span id="streak">0</span></div>
             </div>
 
             <div class="prompt" id="prompt">
@@ -370,10 +367,7 @@
 
             <div class="feedback" id="feedback"></div>
 
-            <div class="controls">
-                <button class="btn" id="start">Bắt đầu (bật nhạc)</button>
-                <button class="btn" id="toggleMusic">Tắt nhạc</button>
-            </div>
+
         </div>
     </div>
 
@@ -438,12 +432,6 @@
             }
         }
 
-        // Utility: show banner
-        function showBanner(txt, ms = 1500) {
-            banner.textContent = txt;
-            banner.style.display = 'block';
-            setTimeout(() => banner.style.display = 'none', ms);
-        }
 
         // update streak UI
         function updateStreakUI() {
@@ -541,14 +529,38 @@
             } catch (e) { /* ignore */ }
         }
 
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
         // Render doors
         function renderDoors(n) {
             doorsWrap.innerHTML = '';
+            const cats = [
+                { emoji: '😺', name: 'Miu Miu' },
+                { emoji: '😻', name: 'Tim' },
+                { emoji: '🐱', name: 'Luna' },
+                { emoji: '🐈', name: 'Cát Tường' },
+                { emoji: '😽', name: 'Sugar' },
+                { emoji: '😹', name: 'Giggle' }
+            ];
+
+            const shuffledCats = shuffle([...cats]);
             for (let i = 0; i < n; i++) {
                 const d = document.createElement('div');
                 d.className = 'door' + (n === 6 ? ' large' : '') + (n === 9 ? ' xlarge' : '');
                 d.dataset.index = i;
-                d.innerHTML = `<div class="face">🚪</div><div class="label">Cửa ${i + 1}</div>`;
+
+                const cat = shuffledCats[i % shuffledCats.length];
+
+                d.innerHTML = `<div class="face">${cat.emoji}</div>
+                                <div class="catName">${cat.name}</div>`;
+
+
                 d.addEventListener('pointerdown', () => {
                     if (busy) return;
                     openDoor(d, i);
@@ -573,32 +585,83 @@
         }
 
         // wrong
+        //khó hơn 
+        // function onWrong(chosenEl) {
+        //     playWrongSound();
+        //     const rect = chosenEl.getBoundingClientRect();
+        //     for (let i = 0; i < 10; i++) {
+        //         createParticle('💔', rect.left + rect.width / 2 + (Math.random() - 0.5) * 40, rect.top + rect.height / 2 + (Math.random() - 0.5) * 20, { size: 18 });
+        //     }
+        //     chosenEl.classList.add('wrong');
+        //     streak = 0; updateStreakUI();
+        //     feedback.textContent = 'Ối, sai rồi bé ơi 😢';
+        //     feedback.style.color = '#b33a6b';
+
+        //     setTimeout(() => {
+        //         // remove wrong class and reset
+        //         const doorsEls = doorsWrap.querySelectorAll('.door');
+        //         doorsEls.forEach(el => el.classList.remove('wrong'));
+        //         resetToBase();
+        //     }, 900);
+        // }
+        //dễ hơn
         function onWrong(chosenEl) {
             playWrongSound();
             const rect = chosenEl.getBoundingClientRect();
             for (let i = 0; i < 10; i++) {
-                createParticle('💔', rect.left + rect.width / 2 + (Math.random() - 0.5) * 40, rect.top + rect.height / 2 + (Math.random() - 0.5) * 20, { size: 18 });
+                createParticle('💔', rect.left + rect.width / 2 + (Math.random() - 0.5) * 40,
+                    rect.top + rect.height / 2 + (Math.random() - 0.5) * 20, { size: 18 });
             }
             chosenEl.classList.add('wrong');
-            streak = 0; updateStreakUI();
-            feedback.textContent = 'Ối, sai rồi — chuỗi về 0 😢';
+            feedback.textContent = 'Ối, sai rồi bé ơi 😢';
             feedback.style.color = '#b33a6b';
 
             setTimeout(() => {
-                // remove wrong class and reset
+                // xóa trạng thái sai nhưng giữ nguyên số cửa và streak
                 const doorsEls = doorsWrap.querySelectorAll('.door');
                 doorsEls.forEach(el => el.classList.remove('wrong'));
-                resetToBase();
-                showBanner('Đã reset về 3 cửa');
+
+                // **render lại cửa hiện tại để reset trạng thái pointer / animation**
+                renderDoors(currentDoors);
+                pickCorrect(); // đảm bảo vẫn có một cửa đúng
+
+                busy = false;
+                feedback.textContent = ''; function onWrong(chosenEl) {
+                    playWrongSound();
+                    const rect = chosenEl.getBoundingClientRect();
+                    for (let i = 0; i < 10; i++) {
+                        createParticle('💔', rect.left + rect.width / 2 + (Math.random() - 0.5) * 40,
+                            rect.top + rect.height / 2 + (Math.random() - 0.5) * 20, { size: 18 });
+                    }
+                    chosenEl.classList.add('wrong');
+                    feedback.textContent = 'Ối, sai rồi bé ơi 😢';
+                    feedback.style.color = '#b33a6b';
+
+                    setTimeout(() => {
+                        // xóa trạng thái sai nhưng giữ nguyên số cửa và streak
+                        const doorsEls = doorsWrap.querySelectorAll('.door');
+                        doorsEls.forEach(el => el.classList.remove('wrong'));
+
+                        // **render lại cửa hiện tại để reset trạng thái pointer / animation**
+                        renderDoors(currentDoors);
+                        pickCorrect(); // đảm bảo vẫn có một cửa đúng
+
+                        busy = false;
+                    }, 900);
+                }
+
             }, 900);
         }
+
+
 
         // correct
         function onCorrect(el) {
             playCorrectSound();
             el.classList.add('win');
             const face = el.querySelector('.face'); if (face) face.textContent = '💖';
-            streak++; updateStreakUI();
+            streak++;
+            updateStreakUI();
             feedback.textContent = 'Tuyệt! Đúng rồi 💘';
             feedback.style.color = '#d63384';
 
@@ -616,7 +679,6 @@
                 pickCorrect();
                 busy = false;
                 feedback.textContent = '';
-                showBanner(`Chuỗi ${streak} — Bây giờ có ${currentDoors} cửa`);
             }, 700);
         }
 
@@ -679,71 +741,35 @@
             } catch (e) { if (onEnd) onEnd(); }
         }
 
-        // controls
-        startBtn.addEventListener('click', async () => {
-            // user gesture: init audio context for WebAudio and allow audio playback
-            try {
-                ensureAudioCtx();
-                if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
-            } catch (e) { /* ignore */ }
 
-            // try autoplay bgm
-            try {
-                bgm.currentTime = 0;
-                bgm.volume = 1;
-                await bgm.play();
-                musicEnabled = true;
-                toggleMusicBtn.textContent = 'Tắt nhạc';
-            } catch (err) {
-                // blocked: prompt user
-                musicEnabled = false;
-                toggleMusicBtn.textContent = 'Bật nhạc';
-                showBanner('Trình duyệt chặn autoplay — nhấn "Bắt đầu" hoặc "Bật nhạc" để phát âm thanh');
-            }
-            resetToBase();
-            showBanner('Bắt đầu — chúc may mắn! 🍀');
-        });
 
-        toggleMusicBtn.addEventListener('click', async () => {
-            if (bgm.paused && !loveFull.classList.contains('show')) {
-                try { await bgm.play(); toggleMusicBtn.textContent = 'Tắt nhạc'; musicEnabled = true; } catch { toggleMusicBtn.textContent = 'Bật nhạc'; musicEnabled = false; }
-            } else if (!bgm.paused && !loveFull.classList.contains('show')) {
-                bgm.pause(); toggleMusicBtn.textContent = 'Bật nhạc'; musicEnabled = false;
-            } else if (loveFull.classList.contains('show')) {
-                // if love audio playing, toggle it instead
-                if (loveAudio.paused) { loveAudio.play().then(() => toggleMusicBtn.textContent = 'Tắt nhạc').catch(() => toggleMusicBtn.textContent = 'Bật nhạc'); }
-                else { loveAudio.pause(); toggleMusicBtn.textContent = 'Bật nhạc'; }
-            }
-        });
+        function showBanner(txt, ms = 1500) {
+            banner.textContent = txt;
+            banner.style.display = 'block';
+            setTimeout(() => banner.style.display = 'none', ms);
+        }
 
-        // when loveAudio ends, ensure UI state
-        loveAudio.addEventListener('ended', () => {
-            // after love audio finishes, keep love screen visible until user restarts
-            toggleMusicBtn.textContent = 'Bật nhạc';
-        });
 
-        // audio file error handlers (optional)
-        bgm.addEventListener('error', () => showBanner('Không thể tải nhạc nền (vui lòng kiểm tra mạng)'));
-        loveAudio.addEventListener('error', () => showBanner('Không thể tải nhạc tỏ tình (vui lòng kiểm tra mạng)'));
 
         // restart button inside love card
         restartBtn.addEventListener('click', () => {
             loveFull.classList.remove('show');
             loveFull.setAttribute('aria-hidden', 'true');
             // fade out loveAudio and fade in bgm
-            fadeAudio(loveAudio, loveAudio.volume || 1, 0, 500, () => { try { loveAudio.pause(); } catch (e) { } });
+            fadeAudio(loveAudio, loveAudio.volume || 1, 0, 500, () => {
+                try { loveAudio.pause(); } catch (e) { }
+            });
             try {
                 bgm.currentTime = 0;
-                bgm.play().catch(() => { });
+                bgm.play()
                 fadeAudio(bgm, 0, 1, 700);
-                toggleMusicBtn.textContent = 'Tắt nhạc';
             } catch (e) { }
             resetToBase();
         });
 
         // keyboard reset (R)
         document.addEventListener('keydown', (e) => {
-            if (e.key.toLowerCase() === 'r') { resetToBase(); showBanner('Đã reset (R)'); }
+            if (e.key.toLowerCase() === 'r') { resetToBase(); }
         });
 
         // init: render 3 doors and pick a correct index
@@ -751,25 +777,18 @@
         pickCorrect();
         updateStreakUI();
 
-        // prevent mobile scroll during play
-        document.addEventListener('touchmove', (e) => {
-            if (!loveFull.classList.contains('show')) e.preventDefault();
-        }, { passive: false });
-
         // lazy init: try to autoplay when page loads (user requested autoplay)
         window.addEventListener('load', async () => {
-            // try to autoplay bgm (may be blocked by browser)
             try {
-                bgm.volume = 1;
-                await bgm.play();
+                bgm.volume = 1; // tắt tạm thời
+                await bgm.play(); // trình duyệt cho phép autoplay im lặng
                 musicEnabled = true;
-                toggleMusicBtn.textContent = 'Tắt nhạc';
-                // if we auto-play, good; if loveAudio was playing earlier, handle
+                fadeAudio(bgm, 0, 1, 700); // bật dần âm lượng
             } catch (err) {
-                // show subtle hint to user to press Start if autoplay blocked
-                showBanner('Nếu không nghe nhạc, nhấn "Bắt đầu" hoặc "Bật nhạc" để kích hoạt âm thanh');
+                showBanner('Nhấn vào trang để bật nhạc nền 🎵');
             }
         });
+
 
         // small helper for spawning hearts used by spawnHeartsFull
         function spawnHearts(n = 8) {
